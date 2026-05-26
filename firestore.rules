@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Collection validation rules
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) && request.resource.data.keys().hasAll(['id', 'email', 'name', 'role']) 
+                               && request.resource.data.role in ['student', 'admin', 'warden'];
+      allow delete: if false;
+    }
+
+    // Rooms collection
+    match /rooms/{roomId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn(); // Restricted in code to staff roles
+    }
+
+    // Bookings collection
+    match /bookings/{bookingId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Payments collection
+    match /payments/{paymentId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Complaints collection
+    match /complaints/{complaintId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.studentId != null;
+      allow update: if isSignedIn();
+    }
+
+    // LeaveRequests collection
+    match /leaveRequests/{leaveId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.studentId != null;
+      allow update: if isSignedIn();
+    }
+
+    // Attendance collection
+    match /attendance/{attendanceId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+  }
+}

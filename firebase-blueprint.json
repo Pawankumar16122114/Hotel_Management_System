@@ -1,0 +1,169 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User schema for hostel management auth and roles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["student", "admin", "warden"] },
+        "passwordHash": { "type": "string" },
+        "phone": { "type": "string" },
+        "studentId": { "type": "string" },
+        "avatar": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "suspended"] }
+      },
+      "required": ["id", "name", "email", "role", "passwordHash", "status"]
+    },
+    "Room": {
+      "title": "Room",
+      "description": "Room availability and characteristics schema",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "roomNumber": { "type": "string" },
+        "capacity": { "type": "number" },
+        "occupied": { "type": "number" },
+        "type": { "type": "string", "enum": ["AC", "Non-AC", "Deluxe"] },
+        "price": { "type": "number" },
+        "floor": { "type": "number" },
+        "image": { "type": "string" },
+        "amenities": { "type": "array" },
+        "status": { "type": "string", "enum": ["Available", "Reserved", "Occupied"] }
+      },
+      "required": ["id", "roomNumber", "capacity", "occupied", "type", "price", "status"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Room allocations and tenure log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "roomId": { "type": "string" },
+        "paymentStatus": { "type": "string", "enum": ["Pending", "Paid", "Failed"] },
+        "bookingDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected", "Vacated"] },
+        "term": { "type": "string" },
+        "receiptUrl": { "type": "string" }
+      },
+      "required": ["id", "studentId", "roomId", "paymentStatus", "bookingDate", "status", "term"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Fee receipt logs representing transactions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "bookingId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "razorpayOrderId": { "type": "string" },
+        "razorpayPaymentId": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Success", "Failed", "Pending"] },
+        "date": { "type": "string" },
+        "type": { "type": "string", "enum": ["Admission Fee", "Monthly Fee", "Caution Deposit"] }
+      },
+      "required": ["id", "bookingId", "studentId", "razorpayOrderId", "amount", "status", "date", "type"]
+    },
+    "Complaint": {
+      "title": "Complaint",
+      "description": "Maintenance requests and issue details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "category": { "type": "string", "enum": ["Electricity", "Water", "WiFi", "Cleaning", "Furniture"] },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "In Progress", "Resolved"] },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High"] },
+        "createdAt": { "type": "string" },
+        "assignedWardenId": { "type": "string" },
+        "comments": { "type": "array" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["id", "studentId", "category", "description", "status", "priority", "createdAt"]
+    },
+    "LeaveRequest": {
+      "title": "LeaveRequest",
+      "description": "Leave permissions log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "reason": { "type": "string" },
+        "fromDate": { "type": "string" },
+        "toDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected"] },
+        "proofUrl": { "type": "string" }
+      },
+      "required": ["id", "studentId", "reason", "fromDate", "toDate", "status"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Daily student intake and check-in log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "date": { "type": "string" },
+        "checkIn": { "type": "string" },
+        "checkOut": { "type": "string" },
+        "status": { "type": "string", "enum": ["Present", "Late", "Absent"] },
+        "lateReason": { "type": "string" }
+      },
+      "required": ["id", "studentId", "date", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Broadcasts and alerts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["payment", "booking", "complaint", "leave", "announcement"] },
+        "readBy": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "title", "message", "type", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Student and staff profile credentials"
+    },
+    "/rooms/{roomId}": {
+      "schema": "Room",
+      "description": "Available hosteling room configurations"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Student booking records"
+    },
+    "/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Financial ledger receipts"
+    },
+    "/complaints/{complaintId}": {
+      "schema": "Complaint",
+      "description": "Raised repairs and issues tracking list"
+    },
+    "/leaveRequests/{leaveId}": {
+      "schema": "LeaveRequest",
+      "description": "Leave of absence permissions list"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "Attendance",
+      "description": "Attendance tracking data"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Broadcasts list"
+    }
+  }
+}

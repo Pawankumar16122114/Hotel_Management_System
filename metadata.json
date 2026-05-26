@@ -1,0 +1,8 @@
+{
+  "name": "Hostel Management System",
+  "description": "An automated, full-stack Hostel Management System with real-time status updates, comprehensive analytics dashboards, integrated payments, automated allocations, and AI-powered hostel voice/chat assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
